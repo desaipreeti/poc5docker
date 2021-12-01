@@ -1,0 +1,93 @@
+version: '3.7'
+services:
+  
+  poc4server:
+   
+    image: poc4server
+    ports:
+      - "8761:8761"
+    networks:
+     - ms-network
+      
+    
+    
+  poc4microservice1:
+    
+    image: poc4microservice1
+    mem_limit: 700m
+    ports:
+      - "8085:8085"
+    depends_on:
+      - poc4microservice2
+      - poc4server
+    networks:
+     - ms-network
+      
+      
+    
+      
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://poc4server:8761/eureka 
+    links:
+      - mgdb
+       
+          
+     
+  poc4microservice2:
+    
+    image: poc4microservice2
+    mem_limit: 700m
+    ports:
+      - "8086:8086"
+    depends_on:
+      
+      - poc4server
+       
+    networks:
+     - ms-network
+      
+   
+     
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://poc4server:8761/eureka 
+    
+    links:
+      - mgdb
+        
+      
+  
+  poc4apigateway:
+     image: poc4apigateway
+     mem_limit: 700m
+     ports:
+      - "8087:8087"
+     depends_on: 
+      
+      - poc4server
+      - poc4microservice1
+      - poc4microservice2
+      
+    
+     environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://poc4server:8761/eureka
+    
+     networks:
+     - ms-network
+      
+     
+   
+  mgdb:
+    image: mongo:latest
+    container_name: "mgdb"
+    mem_limit: 700m
+    ports:
+      - 27017:27017
+      
+      
+    networks:
+     - ms-network
+      
+      
+networks:
+     ms-network: 
+      
